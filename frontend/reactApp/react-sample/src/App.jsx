@@ -31,22 +31,33 @@ const App = () => {
 
       // ファイルからデータを読み込む
       const fetchData = async () => {
-        let allData = [];
-        for (let hour = 0; hour < 24; hour++) {
-          for (let minute = 0; minute < 60; minute++) {
-            const timeStr = `${String(hour).padStart(2, '0')}${String(minute).padStart(2, '0')}`;
-            try {
-              const response = await axios.get(`./data/${date}/${date.replace(/-/g, '')}-${timeStr}.log`);
-              const lineData = response.data.split(", ");
-              const [time, , open, high, low, close] = lineData;
-              allData.push({ time, open: parseFloat(open), high: parseFloat(high), low: parseFloat(low), close: parseFloat(close) });
-            } catch (error) {
-              console.error(`Error fetching data for ${timeStr}:`, error);
-            }
-          }
+        try {
+          const response = await axios.get(`http://localhost:8000/data?date=${date}`);
+          const seenTimes = new Set();
+          const data = response.data
+            .map(item => {
+              const dateOnly = item.datetime.split(" ")[0]; // "yyyy-mm-dd hh:mm"から"yyyy-mm-dd"を取得
+              return {
+                time: dateOnly,
+                open: parseFloat(item.open),
+                high: parseFloat(item.high),
+                low: parseFloat(item.low),
+                close: parseFloat(item.close)
+              };
+            })
+            .filter(item => {
+              if (seenTimes.has(item.time)) {
+                return false;
+              }
+              seenTimes.add(item.time);
+              return true;
+            });
+          candlestickSeries.setData(data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
         }
-        candlestickSeries.setData(allData);
       };
+      
 
       fetchData();
     }
