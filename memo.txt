@@ -1,0 +1,22 @@
+
+
+https://chat.openai.com/c/1347e463-f17d-49f6-94cd-8e53aaf936fc
+
+https://chat.openai.com/c/dc1c6ccd-1016-4769-8325-e8d1f1319af6
+
+
+
+
+構成はこのようになっています
+```
+
+tree -L 4
+cat ./frontend/Dockerfile
+cat ./backend/Dockerfile
+cat ./docker-compose.yml
+cat ./frontend/reactApp/react-sample/src/App.jsx
+cat ./backend/app/main.py
+
+
+
+
