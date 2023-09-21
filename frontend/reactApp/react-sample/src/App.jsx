@@ -9,8 +9,8 @@ const App = () => {
   useEffect(() => {
     if(chartRef.current) {
       const chart = createChart(chartRef.current, { 
-        width: 400, 
-        height: 300,
+        width: 800, 
+        height: 600,
         layout: {
           backgroundColor: '#ffffff',
           textColor: 'rgba(33, 56, 77, 1)',
@@ -33,31 +33,21 @@ const App = () => {
       const fetchData = async () => {
         try {
           const response = await axios.get(`http://localhost:8000/data?date=${date}`);
-          const seenTimes = new Set();
-          const data = response.data
-            .map(item => {
-              const dateOnly = item.datetime.split(" ")[0]; // "yyyy-mm-dd hh:mm"から"yyyy-mm-dd"を取得
-              return {
-                time: dateOnly,
-                open: parseFloat(item.open),
-                high: parseFloat(item.high),
-                low: parseFloat(item.low),
-                close: parseFloat(item.close)
-              };
-            })
-            .filter(item => {
-              if (seenTimes.has(item.time)) {
-                return false;
-              }
-              seenTimes.add(item.time);
-              return true;
-            });
+          const data = response.data.map(item => {
+            const timestamp = new Date(item.datetime).getTime() / 1000; // UNIXタイムスタンプに変換
+            return {
+              time: timestamp,
+              open: parseFloat(item.open),
+              high: parseFloat(item.high),
+              low: parseFloat(item.low),
+              close: parseFloat(item.close)
+            };
+          });
           candlestickSeries.setData(data);
         } catch (error) {
           console.error("Error fetching data:", error);
         }
       };
-      
 
       fetchData();
     }
@@ -66,7 +56,7 @@ const App = () => {
   return (
     <>
       <h1 style={{ color: 'red' }}> Candlestick Chart </h1>
-      <div ref={chartRef} style={{ width: '400px', height: '300px' }}></div>
+      <div ref={chartRef} style={{ width: '800px', height: '600px' }}></div>
       <input type="date" value={date} onChange={e => setDate(e.target.value)} />
     </>
   );
