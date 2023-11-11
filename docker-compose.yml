@@ -1,23 +1,23 @@
 version: '3.9'
 
 services:
-  backend:
+  app:
     build:
-      context: ./backend
+      context: ./api
       dockerfile: Dockerfile
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     volumes:
-      - ./backend/app:/app
+      - ./api/app:/app
     ports:
       - "8000:8000"
 
-  frontend:
+  web:
     build:
-      context: ./frontend
+      context: ./web
       dockerfile: Dockerfile
     volumes:
-      - ./frontend/reactApp:/usr/src/app
-    command: sh -c "cd react-sample && yarn start"
+      - ./web:/usr/src/app      
+    command: sh -c "cd fx-chart && yarn start"
 
     ports:
       - "3000:3000"

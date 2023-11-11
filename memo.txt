@@ -1,23 +1,30 @@
 
+ % tree -L 3 
+.
+├── docker-compose.yml
+└── web
+    └── Dockerfile
 
-https://chat.openai.com/c/1347e463-f17d-49f6-94cd-8e53aaf936fc
-
-https://chat.openai.com/c/dc1c6ccd-1016-4769-8325-e8d1f1319af6
-
-
-
-下記について３０文字で要約して下さい
-
-構成はこのようになっています
-```
-
-tree -L 4
-cat ./frontend/Dockerfile
-cat ./backend/Dockerfile
-cat ./docker-compose.yml
-cat ./frontend/reactApp/react-sample/src/App.jsx
-cat ./backend/app/main.py
+2 directories, 3 files
+%
 
 
+# Dockerイメージをビルドします
+docker compose up -d --build
+
+# react アプリケーションを新しく作ります
+docker-compose run --rm web sh -c "create-react-app fx-chart"
 
 
+# reactアプリを新規インストールしたので コメントを外す
+commit e00c689b86e8c12c55bfed4b707a3d901f035b00 (HEAD -> main)
+diff --git a/docker-compose.yml b/docker-compose.yml
+-    # command: sh -c "cd fx-chart && yarn start"
++    command: sh -c "cd fx-chart && yarn start"
+
+# 再度実行
+docker compose down
+docker compose up -d --build
+
+# ブラウザで確認
+http://localhost:3000/
