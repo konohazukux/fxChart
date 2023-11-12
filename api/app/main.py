@@ -29,7 +29,7 @@ def read_item(item_id: int, query_param: str = None):
 @app.get("/data")
 def read_data(date: str = "2023-09-12"):
     # CSVファイルのパスを指定
-    csv_file_path = os.path.join('data', f"{date}.csv")
+    csv_file_path = os.path.join('data/13minutes', f"{date}.csv")
     
     # ファイルの存在確認
     if not os.path.exists(csv_file_path):
