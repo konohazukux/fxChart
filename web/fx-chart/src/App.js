@@ -4,11 +4,18 @@ import axios from 'axios';
 
 const App = () => {
   const chartRef = useRef(null);
-  const [date, setDate] = useState("2023-09-12"); // デフォルトの日付
+  const [chart, setChart] = useState(null);
+  const [date, setDate] = useState("2023-11-10"); // デフォルトの日付
 
   useEffect(() => {
     if(chartRef.current) {
-      const chart = createChart(chartRef.current, { 
+
+      if (chart) {
+        chart.remove();
+        setChart(null);
+      }
+
+      const newChart = createChart(chartRef.current, { 
         width: 800, 
         height: 600,
         layout: {
@@ -27,14 +34,15 @@ const App = () => {
           },
         },
       });
-      const candlestickSeries = chart.addCandlestickSeries();
+      const candlestickSeries = newChart.addCandlestickSeries();
+      setChart(newChart);
 
       // APIからデータを取得
       const fetchData = async () => {
         try {
           const response = await axios.get(`http://localhost:8000/data?date=${date}`);
           const data = response.data.map(item => {
-            console.log(item);
+            // console.log(item);
             const timestamp = new Date(item.datetime).getTime() / 1000; // UNIXタイムスタンプに変換
             return {
               time: timestamp,
@@ -57,8 +65,15 @@ const App = () => {
   return (
     <>
       <h1 style={{ color: 'red' }}> Candlestick Chart </h1>
-      <div ref={chartRef} style={{ width: '800px', height: '600px' }}></div>
-      <input type="date" value={date} onChange={e => setDate(e.target.value)} />
+      <div className="chart-container">
+        <input
+          type="date"
+          value={date}
+          onChange={e => setDate(e.target.value)}
+          className="date-picker"
+        />
+        <div ref={chartRef} style={{ width: '800px', height: '600px' }}></div>
+      </div>
     </>
   );
 };

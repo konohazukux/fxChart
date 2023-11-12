@@ -28,6 +28,15 @@
   color: #61dafb;
 }
 
+.chart-container {
+  display: flex;
+  align-items: center;
+}
+
+.date-picker {
+  margin-left: 20px;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
