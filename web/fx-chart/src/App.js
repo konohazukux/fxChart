@@ -46,6 +46,10 @@ const App = () => {
         },
       });
       const candlestickSeries = newChart.addCandlestickSeries();
+      const lineSeries = newChart.addLineSeries({
+        color: 'rgba(4, 111, 232, 1)', // ラインの色
+        lineWidth: 2, // ラインの太さ 
+      });
       setChart(newChart); // 新しいチャートインスタンスをステートに保存
 
       // APIからデータを取得
@@ -62,7 +66,17 @@ const App = () => {
               close: parseFloat(item.close)
             };
           });
-          candlestickSeries.setData(data);
+          // candlestickSeries.setData(data);
+
+          const data1 = response.data.map(item => {
+          const timestamp = new Date(item.datetime).getTime() / 1000;
+            return {
+              time: timestamp,
+              value: parseFloat(item.close) // ラインチャートでは `value` プロパティを使用
+            };
+          });
+          lineSeries.setData(data1);
+
         } catch (error) {
           console.error("Error fetching data:", error);
         }
