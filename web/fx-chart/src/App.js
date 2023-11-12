@@ -4,19 +4,20 @@ import axios from 'axios';
 
 const App = () => {
   const chartRef = useRef(null);
-  const [chart, setChart] = useState(null);
-  const [date, setDate] = useState("2023-11-10"); // デフォルトの日付
+  const [chart, setChart] = useState(null); // チャートインスタンスをステートに保存
+  const [date, setDate] = useState(null);
 
   useEffect(() => {
-    if(chartRef.current) {
-
+    if (chartRef.current && date !== null) {
+      // 既存のチャートをクリア
       if (chart) {
         chart.remove();
         setChart(null);
       }
 
-      const newChart = createChart(chartRef.current, { 
-        width: 800, 
+      // 新しいチャートを作成
+      const newChart = createChart(chartRef.current, {
+        width: 800,
         height: 600,
         layout: {
           backgroundColor: '#ffffff',
@@ -33,16 +34,25 @@ const App = () => {
             color: 'rgba(197, 203, 206, 0.5)',
           },
         },
+        localization: {
+          timeFormatter: timestamp => {
+            // タイムスタンプを受け取り、HH:mm形式にフォーマットする
+            return new Date(timestamp * 1000).toLocaleTimeString();
+          },
+        },
+        timeScale: {
+          timeVisible: true,
+          secondsVisible: false,
+        },
       });
       const candlestickSeries = newChart.addCandlestickSeries();
-      setChart(newChart);
+      setChart(newChart); // 新しいチャートインスタンスをステートに保存
 
       // APIからデータを取得
       const fetchData = async () => {
         try {
           const response = await axios.get(`http://localhost:8000/data?date=${date}`);
           const data = response.data.map(item => {
-            // console.log(item);
             const timestamp = new Date(item.datetime).getTime() / 1000; // UNIXタイムスタンプに変換
             return {
               time: timestamp,
@@ -64,19 +74,18 @@ const App = () => {
 
   return (
     <>
-      <h1 style={{ color: 'red' }}> Candlestick Chart </h1>
+      <h1 style={{ color: 'red' }}>Candlestick Chart</h1>
       <div className="chart-container">
         <input
           type="date"
-          value={date}
+          value={date || ''}
           onChange={e => setDate(e.target.value)}
           className="date-picker"
         />
-        <div ref={chartRef} style={{ width: '800px', height: '600px' }}></div>
+        <div ref={chartRef} className="chart" style={{ width: '800px', height: '600px' }}></div>
       </div>
     </>
   );
 };
 
-// Appを外のファイルからも使用できるように export default で外から参照可能にする
 export default App;

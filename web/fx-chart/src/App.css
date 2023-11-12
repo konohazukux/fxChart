@@ -31,9 +31,16 @@
 .chart-container {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  margin-right: 20px; 
 }
 
 .date-picker {
+  margin-left: 20px;
+  margin-right: 20px; 
+}
+
+.chart {
   margin-left: 20px;
 }
 
