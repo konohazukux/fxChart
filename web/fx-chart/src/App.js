@@ -8,9 +8,9 @@ const App = () => {
   const [date, setDate] = useState(null);
 
   // チャートシリーズを設定する関数
-  const setupSeries = (chart, data, seriesType = 'Candlestick') => {
+  const setupSeries = (chart, data, seriesType = 'Candlestick', color = 'rgba(4, 111, 232, 1)') => {
     const series = seriesType === 'Candlestick' ? chart.addCandlestickSeries() : chart.addLineSeries({
-      color: 'rgba(4, 111, 232, 1)',
+      color: color,
       lineWidth: 2,
     });
 
@@ -71,9 +71,9 @@ const App = () => {
         try {
           const response = await axios.get(`http://localhost:8000/data?date=${date}`);
           setupSeries(newChart, response.data, 'Candlestick');
-          setupSeries(newChart, response.data, 'Sma5');
-          setupSeries(newChart, response.data, 'Sma25');
-          setupSeries(newChart, response.data, 'Sma75');
+          setupSeries(newChart, response.data, 'Sma5', 'rgba(255, 0, 0, 1)'); // SMA5の色を赤に設定
+          setupSeries(newChart, response.data, 'Sma25', 'rgba(0, 255, 0, 1)'); // SMA25の色を緑に設定
+          setupSeries(newChart, response.data, 'Sma75', 'rgba(0, 0, 255, 1)'); // SMA75の色を青に設定
         } catch (error) {
           console.error("Error fetching data:", error);
         }
