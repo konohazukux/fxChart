@@ -4,18 +4,40 @@ import axios from 'axios';
 
 const App = () => {
   const chartRef = useRef(null);
-  const [chart, setChart] = useState(null); // チャートインスタンスをステートに保存
+  const [chart, setChart] = useState(null);
   const [date, setDate] = useState(null);
+
+  // チャートシリーズを設定する関数
+  const setupSeries = (chart, data, seriesType = 'Candlestick', color = 'rgba(4, 111, 232, 1)') => {
+    const series = seriesType === 'Candlestick' ? chart.addCandlestickSeries() : chart.addLineSeries({
+      color: color,
+      lineWidth: 2,
+    });
+
+    const formattedData = data.map(item => {
+      const timestamp = new Date(item.datetime).getTime() / 1000;
+      return seriesType === 'Candlestick' ? {
+        time: timestamp,
+        open: parseFloat(item.open),
+        high: parseFloat(item.high),
+        low: parseFloat(item.low),
+        close: parseFloat(item.close),
+      } : {
+        time: timestamp,
+        value: parseFloat(item[seriesType.toLowerCase()]),
+      };
+    });
+
+    series.setData(formattedData);
+  };
 
   useEffect(() => {
     if (chartRef.current && date !== null) {
-      // 既存のチャートをクリア
       if (chart) {
         chart.remove();
         setChart(null);
       }
 
-      // 新しいチャートを作成
       const newChart = createChart(chartRef.current, {
         width: 800,
         height: 600,
@@ -35,48 +57,23 @@ const App = () => {
           },
         },
         localization: {
-          timeFormatter: timestamp => {
-            // タイムスタンプを受け取り、HH:mm形式にフォーマットする
-            return new Date(timestamp * 1000).toLocaleTimeString();
-          },
+          timeFormatter: timestamp => new Date(timestamp * 1000).toLocaleTimeString(),
         },
         timeScale: {
           timeVisible: true,
           secondsVisible: false,
         },
       });
-      const candlestickSeries = newChart.addCandlestickSeries();
-      const lineSeries = newChart.addLineSeries({
-        color: 'rgba(4, 111, 232, 1)', // ラインの色
-        lineWidth: 2, // ラインの太さ 
-      });
-      setChart(newChart); // 新しいチャートインスタンスをステートに保存
 
-      // APIからデータを取得
+      setChart(newChart);
+
       const fetchData = async () => {
         try {
           const response = await axios.get(`http://localhost:8000/data?date=${date}`);
-          const data = response.data.map(item => {
-            const timestamp = new Date(item.datetime).getTime() / 1000; // UNIXタイムスタンプに変換
-            return {
-              time: timestamp,
-              open: parseFloat(item.open),
-              high: parseFloat(item.high),
-              low: parseFloat(item.low),
-              close: parseFloat(item.close)
-            };
-          });
-          // candlestickSeries.setData(data);
-
-          const data1 = response.data.map(item => {
-          const timestamp = new Date(item.datetime).getTime() / 1000;
-            return {
-              time: timestamp,
-              value: parseFloat(item.close) // ラインチャートでは `value` プロパティを使用
-            };
-          });
-          lineSeries.setData(data1);
-
+          setupSeries(newChart, response.data, 'Candlestick');
+          setupSeries(newChart, response.data, 'Sma5', 'rgba(255, 0, 0, 1)'); // SMA5の色を赤に設定
+          setupSeries(newChart, response.data, 'Sma25', 'rgba(0, 255, 0, 1)'); // SMA25の色を緑に設定
+          setupSeries(newChart, response.data, 'Sma75', 'rgba(0, 0, 255, 1)'); // SMA75の色を青に設定
         } catch (error) {
           console.error("Error fetching data:", error);
         }
