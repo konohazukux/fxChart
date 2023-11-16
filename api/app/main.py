@@ -37,5 +37,14 @@ def read_data(date: str = "2023-09-12"):
     
     # CSVファイルの読み込み
     df = pd.read_csv(csv_file_path)
+
+    # 移動平均線の計算
+    df['sma5'] = df['close'].rolling(window=5).mean()
+    df['sma25'] = df['close'].rolling(window=25).mean()
+    df['sma75'] = df['close'].rolling(window=75).mean()
+
+    # NaN値を0で置き換える
+    df.fillna(0, inplace=True)
+
     print(df.to_dict(orient="records"))
     return df.to_dict(orient="records")

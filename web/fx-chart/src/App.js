@@ -50,6 +50,14 @@ const App = () => {
         color: 'rgba(4, 111, 232, 1)', // ラインの色
         lineWidth: 2, // ラインの太さ 
       });
+      const lineSeries2 = newChart.addLineSeries({
+        color: 'rgba(4, 111, 232, 1)', // ラインの色
+        lineWidth: 2, // ラインの太さ 
+      });
+      const lineSeries3 = newChart.addLineSeries({
+        color: 'rgba(4, 111, 232, 1)', // ラインの色
+        lineWidth: 2, // ラインの太さ 
+      });
       setChart(newChart); // 新しいチャートインスタンスをステートに保存
 
       // APIからデータを取得
@@ -66,16 +74,38 @@ const App = () => {
               close: parseFloat(item.close)
             };
           });
-          // candlestickSeries.setData(data);
+          candlestickSeries.setData(data);
 
           const data1 = response.data.map(item => {
-          const timestamp = new Date(item.datetime).getTime() / 1000;
-            return {
-              time: timestamp,
-              value: parseFloat(item.close) // ラインチャートでは `value` プロパティを使用
-            };
-          });
+            const timestamp = new Date(item.datetime).getTime() / 1000;
+              return {
+                time: timestamp,
+                value: parseFloat(item.sma5) 
+              };
+            }
+          );
           lineSeries.setData(data1);
+
+          const data2 = response.data.map(item => {
+            const timestamp2 = new Date(item.datetime).getTime() / 1000;
+              return {
+                time: timestamp2,
+                value: parseFloat(item.sma25) 
+              };
+            }
+          );
+          lineSeries2.setData(data2);
+
+          const data3 = response.data.map(item => {
+            const timestamp3 = new Date(item.datetime).getTime() / 1000;
+              return {
+                time: timestamp3,
+                value: parseFloat(item.sma75) 
+              };
+            }
+          );
+          lineSeries3.setData(data3);
+
 
         } catch (error) {
           console.error("Error fetching data:", error);
